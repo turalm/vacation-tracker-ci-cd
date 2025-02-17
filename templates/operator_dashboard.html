@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator Dashboard - Vacation Tracking System</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2CA58D;
+            --secondary-color: #F5F5F5;
+            --accent-color: #FF7F50;
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            font-family: 'Poppins', sans-serif;
+        }
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .sidebar {
+            background-color: #FFFFFF;
+            height: 100vh;
+            padding-top: 20px;
+            position: fixed;
+            width: 250px;
+            top: 0;
+            left: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+        .sidebar a {
+            display: block;
+            color: #4A4A4A;
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 0 15px;
+        }
+        .sidebar a:hover {
+            background-color: rgba(44,165,141,0.1);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+        .content {
+            margin-left: 260px;
+            padding: 30px;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        .card-header {
+            background-color: white;
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+            padding: 20px 25px;
+        }
+        .card-header h4, .card-header h5 {
+            color: var(--primary-color);
+            margin: 0;
+            font-weight: 600;
+        }
+        .list-group-item {
+            border-radius: 8px !important;
+            margin-bottom: 10px;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .list-group-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background-color: #238776;
+        }
+        .badge {
+            font-size: 0.85em;
+            padding: 0.5em 1em;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        .badge-pending {
+            background-color: #FFF3CD !important;
+            color: #856404;
+        }
+        .badge-approved {
+            background-color: #D4EDDA !important;
+            color: #155724;
+        }
+        .badge-rejected {
+            background-color: #F8D7DA !important;
+            color: #721C24;
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(44,165,141,0.2);
+        }
+        .alert-auto-close {
+            animation: fadeOut 1s ease-in 3s forwards;
+            border-radius: 8px;
+        }
+        @keyframes fadeOut {
+            from {opacity: 1;}
+            to {opacity: 0; display: none;}
+        }
+        .user-info-box {
+            background: linear-gradient(135deg, #2CA58D 0%, #5BBF9D 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .user-info-box h5 {
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        .user-info-box p {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .vacation-days {
+            font-size: 2.5rem !important;
+            font-weight: 600 !important;
+        }
+
+        .badge-cancelled {
+    background-color: #F0F0F0 !important;
+    color: #555555 !important;
+}
+
+.form-control {
+    width: 100%; /* Add this line */
+    height: 100%;
+    border-radius: 8px;
+    padding-inline: 16px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.d-flex flex-column {
+    display: flex;
+    justify-content: center;
+}
+select.form-control {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: url("data:image/svg+xml;utf8,<svg fill='%234a4a4a' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>") no-repeat right 12px center/15px 15px;
+}
+
+
+    </style>
+</head>
+<body>
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert alert-{{ messages[0][0] }} alert-auto-close text-center m-3">
+            {{ messages[0][1] }}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="/">Vacation Tracker</a>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/logout" style="color: white;">Logout</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="/operator_dashboard">📊 Dashboard</a>
+        <a href="/settings">⚙️ Settings</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="container-fluid">
+            <!-- User Info Card -->
+            <div class="user-info-box">
+                <h5>Welcome back,</h5>
+                <p>{{ user.name }}</p>
+                <h5>Remaining Vacation Days</h5>
+                <p class="vacation-days">
+                    {% if remaining_vacation_days is not none %}
+                        {{ remaining_vacation_days }}
+                    {% else %}
+                        0
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- Pending Requests -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Pending Vacation Requests</h5>
+                </div>
+                <div class="card-body p-4">
+                    <ul class="list-group">
+                        {% if requests %}
+                            {% for request in requests %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex flex-column">
+                                        <div class="d-flex align-items-center">
+                                            <span class="mr-3">📅 {{ request.start_date|format_date }} - {{ request.end_date|format_date }}</span>
+                                            <span class="badge badge-pending mr-2">{{ request.leave_reason|replace('_', ' ')|title }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <!-- Corrected: Dynamically apply the correct badge class in lowercase -->
+                                        <span class="badge 
+                                            {% if request.status|lower == 'pending' %}badge-pending
+                                            {% elif request.status|lower == 'approved' %}badge-approved
+                                            {% elif request.status|lower == 'rejected' %}badge-rejected
+                                            {% elif request.status|lower == 'cancelled' %}badge-cancelled{% endif %}">
+                                            {{ request.status|title }}
+                                        </span>
+                                        {% if request.status and request.status|lower == 'pending' %}
+                                            <form action="{{ url_for('cancel_request', request_id=request.id) }}" method="POST" class="ml-3">
+                                                <button type="submit" class="btn btn-sm {% if request.status|lower == 'pending' %}btn-outline-danger{% elif request.status|lower == 'approved' %}btn-outline-success{% elif request.status|lower == 'rejected' %}btn-outline-danger{% endif %}" title="Cancel request">
+                                                    ✕
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item text-center text-muted py-4">
+                                No pending vacation requests
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- New Request Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>New Vacation Request</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ url_for('create_vacation_request') }}" method="POST">
+                        <div class="form-row">
+                            <div class="form-group col-md-4 col-12">
+                                <label>Start Date</label>
+                                <input type="date" class="form-control" name="start_date" required>
+                            </div>
+                            <div class="form-group col-md-4 col-12">
+                                <label>End Date</label>
+                                <input type="date" class="form-control" name="end_date" required>
+                            </div>
+                            <div class="form-group col-md-4 col-12">
+                                <label>Leave Type</label>
+                                <select class="form-control" name="reason" required>
+                                    <option value="" disabled selected>Choose a leave reason</option> <!-- Default input option -->
+                                    <option value="vacation">Vacation</option>
+                                    <option value="sick_leave">Sick Leave</option>
+                                    <option value="family_emergency">Family Emergency</option>
+                                    <option value="personal_reason">Personal</option>
+                                    <option value="study_leave">Study Leave</option>
+                                </select>
+                            </div>
+                            
+                        </div>
+                        <div class="text-right mt-5"> <!-- Increased margin-top -->
+                            <button type="submit" class="btn btn-primary px-4">
+                                📩 Submit Request
+                            </button>
+                        </div>
+                    </form>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Date validation script remains similar with updated selectors
+        $(document).ready(function() {
+            const leaveReasons = {
+                vacation: 3,
+                sick_leave: 2,
+                family_emergency: 2,
+                personal_reason: 1,
+                study_leave: 5
+            };
+
+            function updateEndDate() {
+                const selectedReason = $('select[name="reason"]').val();
+                const startDate = new Date($('input[name="start_date"]').val());
+
+                if (!selectedReason || isNaN(startDate)) return;
+
+                const durationDays = leaveReasons[selectedReason];
+                const endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + durationDays);
+                
+                $('input[name="end_date"]').val(endDate.toISOString().split('T')[0]);
+                $('input[name="end_date"]').attr({
+                    min: startDate.toISOString().split('T')[0],
+                    max: endDate.toISOString().split('T')[0]
+                });
+            }
+
+            $('select[name="reason"], input[name="start_date"]').on('change', updateEndDate);
+            const today = new Date().toISOString().split('T')[0];
+            $('input[name="start_date"]').attr('min', today).val(today);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Admins - Smart Water System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f0f4f7;
+            font-family: 'Arial', sans-serif;
+        }
+        .navbar {
+            background-color: #2575fc;
+        }
+        .navbar a {
+            color: white;
+            font-size: 16px;
+            padding: 14px 20px;
+            text-align: center;
+        }
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .card {
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #2575fc;
+            color: white;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .user-info {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="/">Smart Water System</a>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        Manage Admin Roles
+                    </div>
+                    <div class="card-body">
+                        <h3>Users</h3>
+                        <p>Here you can manage users and grant them admin privileges.</p>
+
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>{{ user.name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% if user.roles == 'Admin' %}
+                                            Admin
+                                        {% else %}
+                                            Operator
+                                        {% endif %}
+                                    </td>
+                                    <td class="action-buttons">
+                                        {% if user.roles != 'Admin' %}
+                                            <form action="{{ url_for('manage_admins') }}" method="POST">
+                                                <input type="hidden" name="email" value="{{ user.email }}">
+                                                <input type="hidden" name="role" value="Admin">
+                                                <input type="hidden" name="is_admin" value="True">
+                                                <button type="submit" class="btn btn-warning">Grant Admin</button>
+                                            </form>
+                                        {% else %}
+                                            <button class="btn btn-secondary" disabled>Already Admin</button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src

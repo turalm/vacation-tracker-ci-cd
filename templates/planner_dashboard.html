@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planner Dashboard - AquaHype</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .navbar {
+            background-color: #6f42c1; /* Purple accent for planner */
+        }
+        .sidebar {
+            background-color: #2d2f33;
+            height: 100vh;
+            padding-top: 20px;
+            position: fixed;
+            width: 250px;
+            top: 0;
+            left: 0;
+        }
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 15px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #4a4d52;
+            transform: translateX(5px);
+        }
+        .content {
+            margin-left: 260px;
+            padding: 20px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: none;
+        }
+        .card-header {
+            background-color: #6f42c1;
+            color: white;
+            font-weight: 600;
+        }
+        .planner-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+        .metric-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: #6f42c1;
+        }
+        .timeline-visual {
+            height: 200px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 20px 0;
+            position: relative;
+        }
+        .progress-bar {
+            height: 20px;
+            border-radius: 10px;
+            background-color: #e9ecef;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #6f42c1;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="d-flex align-items-center">
+            <img src="{{ url_for('static', filename='images/logo/white_on_trans.png') }}" 
+                 alt="AquaHype Logo" style="height: 40px; margin-right: 15px;">
+            <a class="navbar-brand text-white" href="#">AquaHype Planner</a>
+        </div>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link text-white" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Planner Sidebar -->
+    <div class="sidebar">
+        <a href="/planner_dashboard" class="active">Dashboard</a>
+        <a href="/schedule-maintenance">Schedule Maintenance</a>
+        <a href="/project-timelines">Project Timelines</a>
+        <a href="/resource-allocation">Resource Allocation</a>
+        <a href="/settings">Settings</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="container-fluid">
+            <!-- Welcome Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Planner Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Welcome, {{ current_user.name }}!</h4>
+                            <p class="text-muted">Role: {{ current_user.roles|join(', ') }}</p>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <div class="badge badge-primary p-2">Active Projects: {{ active_projects }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Planner Metrics -->
+            <div class="planner-metrics">
+                <div class="metric-card">
+                    <h5>Upcoming Maintenance</h5>
+                    <h2 class="text-purple">{{ upcoming_maintenance|length }}</h2>
+                    <small class="text-muted">Scheduled tasks</small>
+                </div>
+                <div class="metric-card">
+                    <h5>Project Progress</h5>
+                    <h2 class="text-purple">{{ average_progress }}%</h2>
+                    <small class="text-muted">Average completion</small>
+                </div>
+                <div class="metric-card">
+                    <h5>Budget Utilization</h5>
+                    <h2 class="text-purple">{{ budget_used }}%</h2>
+                    <small class="text-muted">Of allocated funds</small>
+                </div>
+            </div>
+
+            <!-- Planning Sections -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Maintenance Schedule
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                {% for task in maintenance_schedule %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="mb-1">{{ task.system }}</h6>
+                                            <small class="text-muted">{{ task.date }}</small>
+                                        </div>
+                                        <span class="badge badge-{{ task.status_color }}">{{ task.status }}</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Project Timeline
+                        </div>
+                        <div class="card-body">
+                            {% for project in projects %}
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>{{ project.name }}</span>
+                                    <small>{{ project.progress }}%</small>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ project.progress }}%"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline Visualization -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    Annual Maintenance Timeline
+                </div>
+                <div class="card-body">
+                    <div class="timeline-visual">
+                        <!-- Add Gantt chart or timeline visualization here -->
+                        <div class="text-center text-muted pt-5">
+                            Timeline Visualization Area
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

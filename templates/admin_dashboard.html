@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Vacation Tracking System</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2CA58D;
+            --secondary-color: #F5F5F5;
+            --accent-color: #FF7F50;
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: white !important;
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+            padding: 20px 25px;
+        }
+
+        .card-header h5 {
+            color: var(--primary-color);
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        .badge {
+            font-size: 0.85em;
+            padding: 0.5em 1em;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .badge-pending {
+            background-color: #FFF3CD !important;
+            color: #856404;
+        }
+
+        .badge-approved {
+            background-color: #D4EDDA !important;
+            color: #155724;
+        }
+
+        .badge-rejected {
+            background-color: #F8D7DA !important;
+            color: #721C24;
+        }
+
+        .btn-success, .btn-danger {
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            margin: 0 3px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success {
+            background-color: var(--primary-color);
+        }
+
+        .btn-success:hover {
+            background-color: #238776;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-1px);
+        }
+
+        .search-box .form-control {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="/">Vacation Tracker</a>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/logout" style="color: white;">Logout</a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h5>Admin Dashboard</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <p class="lead">Welcome, Admin! Manage vacation requests below.</p>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" class="form-control" 
+                               placeholder="Search by email or name..." 
+                               onkeyup="searchVacationRequests()">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Days</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vacationTable">
+                            {% for request in vacation_requests %}
+                            <tr>
+                                <td>{{ request.email }}</td>
+                                <td>{{ request.name }}</td>
+                                <td>{{ request.start_date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ request.end_date.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ (request.end_date - request.start_date).days}}</td>
+                                <td>{{ request.leave_reason|replace('_', ' ')|title }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if request.status == 'Approved' %}badge-approved
+                                        {% elif request.status == 'Rejected' %}badge-rejected
+                                        {% else %}badge-pending{% endif %}">
+                                        {{ request.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if request.status == 'Pending' %}
+                                    <div class="d-inline-flex">
+                                        <form action="{{ url_for('approve_vacation') }}" method="POST">
+                                            <input type="hidden" name="request_id" value="{{ request.id }}">
+                                            <button type="submit" class="btn btn-success">✓</button>
+                                        </form>
+                                        <form action="{{ url_for('reject_vacation') }}" method="POST">
+                                            <input type="hidden" name="request_id" value="{{ request.id }}">
+                                            <button type="submit" class="btn btn-danger">✗</button>
+                                        </form>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function searchVacationRequests() {
+            let input = document.getElementById("searchInput").value.toLowerCase();
+            let table = document.getElementById("vacationTable");
+            let rows = table.getElementsByTagName("tr");
+
+            for (let i = 0; i < rows.length; i++) {
+                let cells = rows[i].getElementsByTagName("td");
+                let emailCell = cells[0] ? cells[0].textContent.toLowerCase() : "";
+                let nameCell = cells[1] ? cells[1].textContent.toLowerCase() : "";
+                
+                if (emailCell.includes(input) || nameCell.includes(input)) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New System - Smart Water System</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Add New Water System</h2>
+        <form action="/add-system" method="POST">
+            <div class="form-group">
+                <label for="systemName">System Name:</label>
+                <input type="text" class="form-control" id="systemName" name="system_name" required>
+            </div>
+            <div class="form-group">
+                <label for="systemStatus">System Status:</label>
+                <select class="form-control" id="systemStatus" name="system_status">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add System</button>
+        </form>
+    </div>
+</body>
+</html>

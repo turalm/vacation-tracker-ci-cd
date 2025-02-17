@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #fff;
+            text-align: center;
+            margin-right: 30px;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 40px 50px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .form-container input[type="text"],
+        .form-container input[type="email"],
+        .form-container input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .button {
+            background-color: #2575fc;
+            color: white;
+            padding: 15px 0;
+            width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #6a11cb;
+            transform: translateY(-3px);
+        }
+
+        .auth-buttons {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .link {
+            font-size: 14px;
+            color: #2575fc;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        .info-text {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .alert-container {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .alert.success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .alert.danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        @media (max-width: 500px) {
+            .form-container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container">
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <h1>Create an Account</h1>
+
+    <div class="form-container">
+        <form method="POST" action="{{ url_for('signup') }}">
+            <input type="text" name="name" class="input-field" placeholder="Full Name" required><br>
+            <input type="email" name="email" class="input-field" placeholder="Email" required><br>
+            <input type="password" name="password" class="input-field" placeholder="Password" required><br>
+            <button type="submit" class="button">Sign Up</button>
+        </form>
+
+        <div class="auth-buttons">
+            <span>Already have an account?</span>
+            <a href="{{ url_for('home') }}" class="link">Login</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

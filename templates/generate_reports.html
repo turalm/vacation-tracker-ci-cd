@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Reports - Smart Water System</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Generate Reports</h2>
+        <form action="/generate-report" method="POST">
+            <div class="form-group">
+                <label for="reportType">Select Report Type:</label>
+                <select class="form-control" id="reportType" name="report_type">
+                    <option value="system_report">System Report</option>
+                    <option value="fault_report">Fault Report</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Report</button>
+        </form>
+    </div>
+</body>
+</html>
